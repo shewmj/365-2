@@ -72,28 +72,66 @@ void Decode(char* inString, size_t length, string fileName) {
 	for (int i = 0; i < length; i++) {  
         bitset<8> header = ToBits8(*(inString+i));
         string scaleString =  header.to_string().substr(0, 4);
+        string coefficientString = header.to_string().substr(4, 2);
+        int coefficient;
+        if(coefficientString == "00"){
+        	coefficient = 0;
+        } else {
+        	coefficient = 2;
+        }
+        
         it = binaryRange.find(scaleString);
         int scale = it->second;
 
+        float prev = 0;
+        float prev2 = 0;
         for(int j = 0; j < 8; j++) {
         	i++;
         	if(i >= length)
         		break;
+
+
+
         	bitset<8> byte = ToBits8(*(inString+i));
         	string bsetString = byte.to_string();
-        	
+
+
         	string sampleString = bsetString.substr(0, 4);
         	it = binarySteps.find(sampleString);
         	float sample = it->second * pow(2, scale);
-        	sample /= pow(10, 12);
+        	if(coefficient == 2) {
+        		float temp = sample;
+        		sample += ((61/32) * prev) - ((15/16) * prev2);
+        		prev2 = prev;
+        		prev = temp;
+        	}
 
+
+
+
+        	sample /= pow(10, 12);
         	values.push_back(sample);
+
+
 
         	sampleString = bsetString.substr(4, 4);
         	it = binarySteps.find(sampleString);
         	sample = it->second * pow(2, scale);
+        	if(coefficient == 2) {
+        		float temp = sample;
+        		sample += ((61/32) * prev) - ((15/16) * prev2);
+        		prev2 = prev;
+        		prev = temp;
+        	}
+
+
+
         	sample /= pow(10, 12);
         	values.push_back(sample);
+
+
+
+        	
         	
         }
        
