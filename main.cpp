@@ -192,6 +192,70 @@ void Encode(char* inString, size_t length, string fileName)
     	sampleRoundCount++; 
     }
 
+/*
+
+    int iter = 0;
+    vector<short int> coefficients = {};
+    for(int i = 0; i < scales.size(); i++) {
+    	float scale = pow(2, scales[i]);
+    	float mse0 = 0;
+    	float mse1 = 0;
+	    float mse2 = 0;
+	    float mse3 = 0;
+    	for(int j = 0; j < 16; j++) {
+
+    		float decoded = (scale * encodedValues[iter]);
+
+    		float temp = decoded;
+    		mse0 += pow(values[iter] - temp, 2);
+
+    		if(j == 0) {
+    			mse1 += pow(values[iter] - temp, 2);
+    			mse2 += pow(values[iter] - temp, 2);
+    			mse3 += pow(values[iter] - temp, 2);
+    		}
+    		if(j == 1) {
+    			
+    			mse2 += pow(values[iter] - temp, 2);
+    			mse3 += pow(values[iter] - temp, 2);
+    		}
+
+
+
+    		if(j > 0) {
+    			float temp1 = decoded + ((15/16) * encodedValues[i - 1]);
+    			mse1 += pow(values[iter] - temp1, 2);
+    		}
+
+
+    		if(j > 1) {
+    			float temp2 = decoded + ((61/32) * encodedValues[i - 1]) - ((15/16) * encodedValues[i - 2]);
+    			mse2 += pow(values[iter] - temp2, 2);
+
+    			float temp3 = decoded + ((115/64) * encodedValues[i - 1]) - ((13/16) * encodedValues[i - 2]);
+    			mse3 += pow(values[iter] - temp3, 2);
+
+    			
+    		}
+
+    		iter++;
+
+    	}
+
+    	//cout << mse0 << "   " << mse1 << "    " << mse2 << "    " << mse3 << endl;
+
+    	if(mse0 <= mse2) {
+    		coefficients.push_back(0);
+    		//cout << "0" << endl;
+    	} else {
+    		coefficients.push_back(2);
+    		//cout << "1" << endl;
+    	}
+
+    }
+
+*/
+
 
 
     //write scales and encoded samples to file
@@ -204,7 +268,9 @@ void Encode(char* inString, size_t length, string fileName)
     	string headerString = "";
     	it = binaryRange.find(scales[headerCount]);
     	headerString = it->second;
+    	
     	headerString += "0000";
+    	
     	std::bitset<8> bit_set(headerString, 0, headerString.size(), '0', '1'); 
 		ulong = bit_set.to_ulong(); 
 		uchar = static_cast<unsigned char>(ulong);
