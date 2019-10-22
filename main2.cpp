@@ -66,134 +66,50 @@ void Decode(char* inString, size_t length, string fileName) {
 
 
 
-
-
+	//decode each 9byte block into 32 bits floats
   	std::map<string,int>::iterator it;
   	vector<float> values = {};
-
-
 	for (int i = 0; i < length; i++) {  
         bitset<8> header = ToBits8(*(inString+i));
-        //cout << "+)))))))))" << header << endl;
         string scaleString =  header.to_string().substr(0, 4);
         it = binaryRange.find(scaleString);
         int scale = it->second;
 
-
-    	
         for(int j = 0; j < 8; j++) {
         	i++;
         	if(i >= length)
         		break;
         	bitset<8> byte = ToBits8(*(inString+i));
         	string bsetString = byte.to_string();
-        	//cout << "++++++++++" << bsetString << endl;
-
+        	
         	string sampleString = bsetString.substr(0, 4);
         	it = binarySteps.find(sampleString);
         	float sample = it->second * pow(2, scale);
         	sample /= pow(10, 12);
 
         	values.push_back(sample);
-        	//cout << sample << endl;
 
         	sampleString = bsetString.substr(4, 4);
         	it = binarySteps.find(sampleString);
         	sample = it->second * pow(2, scale);
         	sample /= pow(10, 12);
         	values.push_back(sample);
-        	//cout << sample << endl;
+        	
         }
        
     }
 
-    cout << "*** " << values.size();
-    //string decodedString = "";
-
-    //float temp;
+    //reverse byte order for 32 bit float big endian file output
+    float t;
     for (int i = 0 ; i < values.size(); i++) {
-
-    	
-		float t = values[i];
+		t = values[i];
 		
-		
-
 		char data[4];
 		memcpy(data, &t, sizeof(t));
 		char a = data[0];
 		char b = data[1];
 		char c = data[2];
 		char d = data[3];
-
-
-
-
-		
-
-		//float temp
-		
-		//string ttt;
-	
-
-        //char dd []= {a, b, c, d}; 
-		
-		//memcpy(&temp, &dd, sizeof(temp));
-		//values[i] = temp;
-	/*	
-		cout << t << endl;
-		bitset<8> my_bset;
-		my_bset=ToBits8(data[0]);
-        ttt = my_bset.to_string();
-        cout << ttt << " ";
-        my_bset=ToBits8(data[1]);
-        ttt = my_bset.to_string();
-        cout << ttt << " ";
-        my_bset=ToBits8(data[2]);
-        ttt = my_bset.to_string();
-        cout << ttt << " ";
-        my_bset=ToBits8(data[3]);
-        ttt = my_bset.to_string();
-        cout << ttt << endl;
-	
-		data[0] = d;
-		data[1] = c;
-		data[2] = b;
-		data[3] = a;
-
-		my_bset=ToBits8(data[0]);
-        ttt = my_bset.to_string();
-        cout << ttt << " ";
-        my_bset=ToBits8(data[1]);
-        ttt = my_bset.to_string();
-        cout << ttt << " ";
-        my_bset=ToBits8(data[2]);
-        ttt = my_bset.to_string();
-        cout << ttt << " ";
-        my_bset=ToBits8(data[3]);
-        ttt = my_bset.to_string();
-        cout << ttt << endl;
-	
-		my_bset=ToBits8(data[3]);
-        ttt = my_bset.to_string();
-        cout << ttt << endl;
-        my_bset=ToBits8(data[2]);
-        ttt = my_bset.to_string();
-        cout << ttt << endl;
-        my_bset=ToBits8(data[1]);
-        ttt = my_bset.to_string();
-        cout << ttt << endl;
-        my_bset=ToBits8(data[0]);
-        ttt = my_bset.to_string();
-        cout << ttt << endl;
-
-		
-		
-        float temp;
-		memcpy(&temp, &data, sizeof(temp));
-		cout << temp << endl;
-*/
-		//cout << values[i] << endl;// << "((((((((" << temp << endl;
-
 
 		myfile << d;
 		myfile << c;
@@ -205,13 +121,6 @@ void Decode(char* inString, size_t length, string fileName) {
     myfile.close();
 
 
-
-    
-
-
-    //return decodedString;
-    //return "sds";
-
 }
 
 
@@ -219,32 +128,13 @@ void Decode(char* inString, size_t length, string fileName) {
 int main(int argc, char** argv) 
 { 
 
-/*
-	ifstream inFile;
-	inFile.open(argv[1]);
-	if (!inFile) {
-		cout << "Unable to open file";
-		exit(1); // terminate with error
-	}
-
-	ofstream myfile;
-	myfile.open (argv[2]);
-
-
-	string inString((std::istreambuf_iterator<char>(inFile)),
-                 std::istreambuf_iterator<char>());
-	inFile.close();
-
-*/
 
 	ifstream inFile; 
 	size_t size = 0;
 	inFile.open(argv[1], ios::in|ios::binary);
 	char* oData = 0;
+
 	if(inFile.is_open()) {
-
-	
-
 		inFile.seekg(0, ios::end);
 		size = inFile.tellg();
 		inFile.seekg(0, ios::beg);
@@ -254,14 +144,9 @@ int main(int argc, char** argv)
 		
 	}
 
-
-	
-
 	Decode(oData, size, argv[2]);
 
-	//myfile << decoded;
-	//myfile.close();
-
+	
 	return 0;
 
 

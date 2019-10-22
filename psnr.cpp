@@ -23,7 +23,7 @@ int main(int argc, char** argv)
 { 
 
 
-
+	//read file1
 	ifstream inFile; 
 	size_t size = 0;
 	inFile.open(argv[1], ios::in|ios::binary);
@@ -41,14 +41,12 @@ int main(int argc, char** argv)
 		oData[size] = '\0';
 	}
 
-
+	//read file2
 	ifstream inFile2; 
 	size_t size2 = 0;
 	inFile2.open(argv[2], ios::in|ios::binary);
 	char* oData2 = 0;
 	if(inFile2.is_open()) {
-
-
 
 		inFile2.seekg(0, ios::end);
 		size2 = inFile2.tellg();
@@ -59,21 +57,14 @@ int main(int argc, char** argv)
 		oData2[size2] = '\0';
 	}
 
-	/*
-	for (int i = 0; i < size; i++) {  
-
-		char a = *(oData + i);
-		bitset<8> temp = ToBits8(a);
-
-
-	cout << temp.to_string() << endl;
-
-
-	}     
-	*/
+	
+	//reverse bytes and take difference between 32 bit float values
 	float MSE = 0;
-	float temp1;
-	float temp2;
+	float flo1;
+	float flo2;
+	short int short1;
+	short int short2;
+	float diff;
 	int j = 0;
 	for (int i = 0; i < size; i++) {  
         char a = *(oData + i);
@@ -85,7 +76,10 @@ int main(int argc, char** argv)
 		char d = *(oData + i);
 
 		char reversed [] = {d, c, b, a};
-		memcpy(&temp1, &reversed, sizeof(temp1));
+		memcpy(&flo1, &reversed, sizeof(flo1));
+		flo1 = flo1 * pow(10, 12);
+		short1 = (short int)flo1;
+		
 
 		a = *(oData2 + j);
         j++;
@@ -97,32 +91,33 @@ int main(int argc, char** argv)
 		j++;
 
 		char reversed2 []= {d, c, b, a};
-		memcpy(&temp2, &reversed2, sizeof(temp2));
+		memcpy(&flo2, &reversed2, sizeof(flo2));
+		flo2 = flo2 * pow(10, 12);
+		short2 = (short int)flo2;
+		
 
 
-		float tt = pow(temp1 - temp2, 2);
-
-		MSE += tt;
+		diff = pow(short1 - short2, 2);
+		
+		MSE += diff;
 		
 		//cout << temp1 << "       " << temp2 << "    " << tt << endl;
 		
     }     
 
 
-
+    
     MSE = MSE / (size / 4);
 
-    double MAX = std::numeric_limits<float>::max() * 2;
+    float MAX = 32767 * 2;
 
-    cout << MAX << endl;
+
+    
 
     float psnr = (20 * log10(MAX)) - (10 * log10(MSE)); 
-    cout << "psnr: " << psnr << "    " << (20 * log10(MAX)) << "    " << (10 * log10(MSE)) << endl;
+    cout << "psnr: " << psnr << endl;
 
 
-    cout << MAX << endl;
-    cout << MSE << endl;
-    
 	 
 
 }

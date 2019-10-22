@@ -53,7 +53,8 @@ void Encode(char* inString, size_t length, string fileName)
   	ofstream myfile;
 	myfile.open (fileName);
 
-
+	//Convert 32 bit big endian to little endian
+	//scale to short int
 	float temp;
 	vector<short int> values = {};
 	for (int i = 0; i < length; i++) {  
@@ -71,11 +72,11 @@ void Encode(char* inString, size_t length, string fileName)
 		temp = temp * pow(10, 12);
 		short int si = (short int)temp;
 		values.push_back(si);
-		//cout << temp << endl;
+		
 		
     }     
-    cout << length << "-----" << values.size() << endl;
-
+   
+    //find scale for every 16 bit sample
     vector<short int> scales = {};
     for(int i = 0; i < values.size(); i++) {
     	short int high = 0;
@@ -94,7 +95,7 @@ void Encode(char* inString, size_t length, string fileName)
     	}
     	i--;
 
-    	//cout << "===" << i << "===" << high << "===" << low << endl;
+    
     	short int lowScale;
     	if(low / 1.0 >= -8.0){
     		lowScale = 0;
@@ -160,12 +161,8 @@ void Encode(char* inString, size_t length, string fileName)
     	}
     }
 
-    
-    for(int i = 0; i < 20; i++) {
-    	cout << "&&&& " << scales[i] << endl;
-    }
-    cout << "-----[[[[[---" << scales.size() << endl;
-
+  
+    //encode samples into 4 bits using 16 sample scales
 	int sampleRoundCount = 0;
 	float stepSize;
 	int sampleCount;
@@ -196,18 +193,9 @@ void Encode(char* inString, size_t length, string fileName)
     }
 
 
-    for(int i = 0; i < 90; i++) {
-    	cout << i << "^^^" <<  encodedValues[i] << endl;
-    }
 
-    cout << "----[[[-" << encodedValues.size() << endl;
-    cout << encodedValues[3400000] << endl;
-
-
-    //string encodedString  = "";
-    //char* encodedString = new char[encodedValues.size() + (encodedValues.size()/16) + 100];
+    //write scales and encoded samples to file
     int encodedIter = 0;
-    
     unsigned long ulong;
 	unsigned char uchar;
     int headerCount = 0;
@@ -221,8 +209,7 @@ void Encode(char* inString, size_t length, string fileName)
 		ulong = bit_set.to_ulong(); 
 		uchar = static_cast<unsigned char>(ulong);
 		myfile << uchar;
-		//encodedString[encodedIter++] = uchar;
-
+		
 		string byte = "";
 		for(int j = 0; j < 8; j++) {
 			if(i %100000 == 0)
@@ -264,8 +251,7 @@ void Encode(char* inString, size_t length, string fileName)
     	headerCount++;
     }
 
-   	//cout << "sadads    " << encodedString.size();
-    //return encodedString;
+   
     myfile.close();
    
 
@@ -275,24 +261,7 @@ void Encode(char* inString, size_t length, string fileName)
 
 int main(int argc, char** argv) 
 { 
-/*
-	ifstream inFile;
-	inFile.open(argv[1]);
-	if (!inFile) {
-		cout << "Unable to open file";
-		exit(1); // terminate with error
-	}
-
 	
-
-
-	string inString((std::istreambuf_iterator<char>(inFile)),
-                 std::istreambuf_iterator<char>());
-	inFile.close();
-*///myfile.open (argv[2]);
-	
-
-
 
 	ifstream inFile; 
 	size_t size = 0;

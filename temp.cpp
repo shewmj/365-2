@@ -87,7 +87,7 @@ int main(int argc, char** argv)
         temp = temp * pow(10, 12);
         short int si = (short int)temp;
         //values.push_back(si);
-        cout << count++ << "   " << temp << endl;
+        cout << count++ << "   " << si << endl;
     
     }     
 
